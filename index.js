@@ -1,8 +1,8 @@
 const express = require('express')
+const app = express()
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
-const app = express()
 const port = process.env.PORT || 5000
 
 // middleware
@@ -24,7 +24,20 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+const campaignCollection = client.db('campaignDB').collection('campaign');
 
+// campaign related apis
+app.get('/campaign', async(req,res)=>{
+    const result = await campaignCollection.find().toArray();
+    res.send(result);
+})
+
+app.post('/campaign', async(req,res)=>{
+    const campaign = req.body;
+    console.log(campaign);
+    const result = await campaignCollection.insertOne(campaign);
+    res.send(result);
+})
 
 
 
