@@ -41,6 +41,11 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/campaign/:id', async(req,res)=>{
+            const result = await campaignCollection.findOne()
+            res.send(result)
+        })
+
         app.post('/campaign', async (req, res) => {
             const campaign = req.body;
             const result = await campaignCollection.insertOne(campaign);
