@@ -15,40 +15,48 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
-  try {
-const campaignCollection = client.db('campaignDB').collection('campaign');
+    try {
+        const campaignCollection = client.db('campaignDB').collection('campaign');
 
-// campaign related apis
-app.get('/campaign', async(req,res)=>{
-    const result = await campaignCollection.find().toArray();
-    res.send(result);
-})
+        // campaign related apis
+        app.get('/campaign', async (req, res) => {
+            const result = await campaignCollection.find().toArray();
+            res.send(result);
+        })
 
-app.post('/campaign', async(req,res)=>{
-    const campaign = req.body;
-    console.log(campaign);
-    const result = await campaignCollection.insertOne(campaign);
-    res.send(result);
-})
+        app.get('/campaign/running', async (req, res) => {
+            // const deadline = req.body.deadline;
+            const currentDate = new Date()
+            const findBy = { deadline: { $gt: currentDate.toISOString().split('T')[0] } }
+            const query = campaignCollection.find(findBy).limit(6)
+            const result = await query.toArray();
+            res.send(result);
+        })
+
+        app.post('/campaign', async (req, res) => {
+            const campaign = req.body;
+            const result = await campaignCollection.insertOne(campaign);
+            res.send(result);
+        })
 
 
 
 
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
-  }
+        await client.connect();
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
+    }
 }
 run().catch(console.dir);
 
