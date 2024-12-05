@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const campaignCollection = client.db('campaignDB').collection('campaign');
-        const userCollection = client.db('campaignDB').collection('user');
+        const donationCollection = client.db('campaignDB').collection('donation');
 
         // campaign related apis
         app.get('/campaign', async (req, res) => {
@@ -89,10 +89,17 @@ async function run() {
             res.send(result)
         })
 
-        // user related apis
-        app.post('/user', async (req, res) => {
+        // donation related apis
+        app.get('/donation/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const result = await donationCollection.find(query).toArray();
+            res.send(result)
+        })
+
+        app.post('/donation', async (req, res) => {
             const user = req.body;
-            const result = await userCollection.insertOne(user);
+            const result = await donationCollection.insertOne(user);
             res.send(result);
         })
 
