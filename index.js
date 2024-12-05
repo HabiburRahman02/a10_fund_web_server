@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT || 5000
@@ -25,6 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const campaignCollection = client.db('campaignDB').collection('campaign');
+        const userCollection = client.db('campaignDB').collection('user');
 
         // campaign related apis
         app.get('/campaign', async (req, res) => {
@@ -32,8 +33,14 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/campaign/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {email}
+            const result = await campaignCollection.find(query).toArray();
+            res.send(result)
+        })
+
         app.get('/campaign/running', async (req, res) => {
-            // const deadline = req.body.deadline;
             const currentDate = new Date()
             const findBy = { deadline: { $gt: currentDate.toISOString().split('T')[0] } }
             const query = campaignCollection.find(findBy).limit(6)
@@ -41,14 +48,23 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/campaign/:id', async(req,res)=>{
-            const result = await campaignCollection.findOne()
+        app.get('/campaign/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await campaignCollection.findOne(query)
             res.send(result)
         })
 
         app.post('/campaign', async (req, res) => {
             const campaign = req.body;
             const result = await campaignCollection.insertOne(campaign);
+            res.send(result);
+        })
+
+        // user related apis
+        app.post('/user', async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
             res.send(result);
         })
 
