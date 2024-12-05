@@ -35,21 +35,22 @@ async function run() {
 
         app.get('/campaign/:email', async (req, res) => {
             const email = req.params.email;
-            const query = {email}
+            const query = { email }
             const result = await campaignCollection.find(query).toArray();
             res.send(result)
         })
 
-        app.get('/campaign/running', async (req, res) => {
-            const currentDate = new Date()
-            const findBy = { deadline: { $gt: currentDate.toISOString().split('T')[0] } }
+        app.get('/campaignByRunning/running', async (req, res) => {
+            const currentDate = new Date().toISOString().split('T')[0];
+            console.log(currentDate);
+            const findBy = { deadline: { $gt: currentDate } }
             const query = campaignCollection.find(findBy).limit(6)
             const result = await query.toArray();
             console.log(result);
             res.send(result);
         })
 
-        app.get('/campaign/:id', async (req, res) => {
+        app.get('/campaignById/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await campaignCollection.findOne(query)
@@ -62,10 +63,29 @@ async function run() {
             res.send(result);
         })
 
-        app.delete('/campaign/:id', async(req,res)=>{
+        app.delete('/campaign/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await campaignCollection.deleteOne(query);
+            res.send(result)
+        })
+        // const updatedCampaign = { title, type, deadline, amount, photoUrl, description }
+        app.patch('/campaign/:id', async (req, res) => {
+            const id = req.params.id;
+            const campaign = req.body;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updateCampaign = {
+                $set: {
+                    title: campaign.title,
+                    type: campaign.type,
+                    deadline: campaign.deadline,
+                    amount: campaign.amount,
+                    photoUrl: campaign.photoUrl,
+                    description: campaign.description,
+                },
+            };
+            const result  = await campaignCollection.updateOne(filter,updateCampaign,options);
             res.send(result)
         })
 
