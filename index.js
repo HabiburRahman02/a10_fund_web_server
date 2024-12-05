@@ -45,6 +45,7 @@ async function run() {
             const findBy = { deadline: { $gt: currentDate.toISOString().split('T')[0] } }
             const query = campaignCollection.find(findBy).limit(6)
             const result = await query.toArray();
+            console.log(result);
             res.send(result);
         })
 
@@ -59,6 +60,13 @@ async function run() {
             const campaign = req.body;
             const result = await campaignCollection.insertOne(campaign);
             res.send(result);
+        })
+
+        app.delete('/campaign/:id', async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await campaignCollection.deleteOne(query);
+            res.send(result)
         })
 
         // user related apis
