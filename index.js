@@ -46,7 +46,6 @@ async function run() {
             const findBy = { deadline: { $gt: currentDate } }
             const query = campaignCollection.find(findBy).limit(6)
             const result = await query.toArray();
-            console.log(result);
             res.send(result);
         })
 
@@ -103,6 +102,11 @@ async function run() {
             res.send(result);
         })
 
+        app.post('/donation/:email', async(req,res)=>{
+            const donationInfo = req.body;
+            const result = await donationCollection.insertOne(donationInfo);
+            res.send(result)
+        })
 
 
 
