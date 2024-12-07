@@ -27,6 +27,11 @@ async function run() {
         const donationCollection = client.db('campaignDB').collection('donation');
 
         // campaign related apis
+               // sort method
+        app.get('/campaignBySort', async(req,res)=>{
+            const result =await campaignCollection.find().sort({amount: 1}).toArray();
+            res.send(result)
+        })
         app.get('/campaign', async (req, res) => {
             const result = await campaignCollection.find().toArray();
             res.send(result);
