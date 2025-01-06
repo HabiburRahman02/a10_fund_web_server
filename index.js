@@ -48,7 +48,7 @@ async function run() {
             const currentDate = new Date().toISOString().split('T')[0];
             console.log(currentDate);
             const findBy = { deadline: { $gt: currentDate } }
-            const query = campaignCollection.find(findBy).limit(6)
+            const query = campaignCollection.find(findBy).limit(8)
             const result = await query.toArray();
             res.send(result);
         })
